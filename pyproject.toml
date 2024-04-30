@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "dota2-camera-distance"
+version = "0.1.0"
+description = ""
+authors = ["genchsusu <pctxiaozhu@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "~3.12"
+pymem = "^1.13.1"
+pywin32-ctypes = "^0.2.2"
+
+[tool.poetry.group.dev.dependencies]
+pyinstaller = "^6.6.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
