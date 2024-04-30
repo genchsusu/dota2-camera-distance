@@ -9,6 +9,7 @@ readme = "README.md"
 python = "~3.12"
 pymem = "^1.13.1"
 pywin32-ctypes = "^0.2.2"
+requests = "^2.31.0"
 
 [tool.poetry.group.dev.dependencies]
 pyinstaller = "^6.6.0"
