@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox
 from modules.distance import DistanceInput  # Ensure the import path matches the actual file location
 from utils import config
 
@@ -7,12 +6,7 @@ class Dota2(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("Dota2")
-        self.config_update()
-
-    def config_update(self):
-        # Check for config updates at startup
-        if config.check_for_updates():
-            messagebox.showinfo("Update", "Configuration has been updated. Please restart the application.")
+        config.check_for_updates()
 
     def init_ui(self):
         self.group = tk.Frame(self)

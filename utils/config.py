@@ -16,22 +16,18 @@ def download_config():
 def check_for_updates():
     if not os.path.exists(CONFIG_LOCAL):
         download_config()
-        return True
+        return
     response = requests.get(CONFIG_URL)
     response.raise_for_status()
     local_config = json.load(open(CONFIG_LOCAL, 'r'))
     remote_config = response.json()
-    
     if local_config != remote_config:
         root = tk.Tk()
-        root.withdraw()  # Hide the root window
-        root.destroy()
+        root.withdraw()  # Hide the main window
         if messagebox.askyesno("Update Available", "Do you want to update now?"):
             download_config()
-            return True
-        else:
-            return False
-    return False
+        root.destroy()
+    return
 
 def load_config():
     with open(CONFIG_LOCAL, 'r') as f:
