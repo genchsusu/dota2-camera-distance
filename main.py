@@ -1,63 +1,36 @@
-import json
 import tkinter as tk
-from tkinter import simpledialog, messagebox
-from pymem import Pymem
-from pymem.process import module_from_name
-import os
-import requests
+from tkinter import messagebox
+from modules.distance import DistanceInput  # Ensure the import path matches the actual file location
+from utils import config
 
-CONFIG_URL = "https://raw.githubusercontent.com/genchsusu/dota2-camera-distance/master/config.json"
-CONFIG_LOCAL = "config.json"
+class Dota2(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Dota2")
+        self.config_update()
 
-def download_config():
-    response = requests.get(CONFIG_URL)
-    response.raise_for_status()  # Raise an error for bad status codes
-    with open(CONFIG_LOCAL, 'w') as f:
-        f.write(response.text)
+    def config_update(self):
+        # Check for config updates at startup
+        if config.check_for_updates():
+            messagebox.showinfo("Update", "Configuration has been updated. Please restart the application.")
 
-def check_for_updates():
-    response = requests.get(CONFIG_URL)
-    response.raise_for_status()
-    local_config = json.load(open(CONFIG_LOCAL, 'r'))
-    remote_config = response.json()
-    return local_config != remote_config
+    def init_ui(self):
+        self.group = tk.Frame(self)
+        self.group.pack(padx=20, pady=10)
 
-# Ensure config file exists and check for updates
-if not os.path.exists(CONFIG_LOCAL):
-    download_config()
-elif check_for_updates():
-    root = tk.Tk()
-    root.withdraw()  # Hide the main window
-    if messagebox.askyesno("Update Available", "Do you want to update now?"):
-        download_config()
-    root.destroy()
+        # Initialize DistanceInput without the unnecessary 'update_distance' argument
+        self.distance_input = DistanceInput(self.group, "Camera Distance:")
+        self.distance_input.pack(padx=5, pady=5)
 
-# Load process address from config.json
-with open(CONFIG_LOCAL, 'r') as f:
-    config = json.load(f)
-    
-# Convert hexadecimal string to integer
-process = int(config['address'], 16)
+    def on_focus(self, event):
+        # Refresh the input when the window gains focus
+        self.distance_input.refresh()
 
-# Function to modify memory
-def modify_memory(distance):
-    try:
-        mem = Pymem("dota2.exe")
-        game_module = module_from_name(mem.process_handle, "client.dll").lpBaseOfDll
-        mem.write_float(game_module + process, float(distance))
-        return "Successful"
-    except Exception as e:
-        return f"Error: {e}"
-
-# GUI creation
-def show_input_dialog():
-    root = tk.Tk()
-    root.withdraw()  # Hide the main window
-    distance = simpledialog.askfloat("Input", "Distance:", parent=root)
-    if distance is not None:
-        result = modify_memory(distance)
-        messagebox.showinfo("Result", result)
-    root.destroy()
+    def run(self):
+        self.init_ui()
+        self.bind("<FocusIn>", self.on_focus)
+        self.mainloop()
 
 if __name__ == "__main__":
-    show_input_dialog()
+    app = Dota2()
+    app.run()
